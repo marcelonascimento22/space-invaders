@@ -1,20 +1,24 @@
-import { INITIAL_FRAMES, PATH_ENGINE_IMAGE, PATH_ENGINE_SPRITES, PATH_SPACESHIP_IMAGE } from "../utils/constants.js";
+import {PATH_ENGINE_IMAGE, PATH_ENGINE_SPRITES, PATH_SPACESHIP_IMAGE, INITIAL_FRAMES} from "../utils/constants.js";
 import Projectile from "./Projectile.js";
 
 class Player {
     constructor(canvasWidth, canvasHeight){
-        this.width = 48 * 2;
-        this.height = 48 * 2;
-        this.velocity = 8
+        //Definindo o tamamnho
+        this.width = 48 * 2;    //Largura Renderizada
+        this.height = 48 * 2;   //AlturaRenderizada
+        //Definindo a velocidade
+        this.velocity = 4;
+        //Posição
         this.position = {
             x: canvasWidth / 2 - this.width / 2,
-            y: canvasHeight - this.height  - 30
+            y: canvasHeight - this.height  - 20
         };
 
+        //Instanciando as imagens
         this.image = this.getImage(PATH_SPACESHIP_IMAGE);
         this.engineImage = this.getImage(PATH_ENGINE_IMAGE);
         this.engineSprites = this.getImage(PATH_ENGINE_SPRITES);
-
+       
         this.sx = 0;
         this.frameCount = INITIAL_FRAMES;
     }
@@ -35,42 +39,45 @@ class Player {
     }
 
     draw(ctx) {
-         
-/*
+        
         ctx.drawImage(
             this.image, 
             this.position.x, 
             this.position.y, 
-            this.width, 
-            this.height);
+            this.width, //Largura Renderizada
+            this.height //Altura Renderizada
+        );
 
         ctx.drawImage(
             this.engineSprites, 
             this.sx,
             0, 
             48,
-            48,
+            42,
             this.position.x, 
             this.position.y, 
             this.width, 
             this.height);
 
-        ctx.drawImage(
+            ctx.drawImage(
             this.engineImage, 
             this.position.x, 
-            this.position.y + 8, 
+            this.position.y + 5, //Deslocando o motor
             this.width, 
             this.height);
 
-        this.update();
-        */
+        
+
+       this.update();
+    /*    
         ctx.fillStyle = "red";
         ctx.fillRect(
-            this.position.x, 
-            this.position.y, 
-            this.width,  
-            this.height
+            this.position.x,    //Posição eixo X 
+            this.position.y,    //Posição eixo y 
+            this.width,         //Largura
+            this.height         //Altura
         );
+        */
         
     }
 
@@ -94,6 +101,5 @@ class Player {
         projectiles.push(p);
     }
 }
-2;
 
 export default Player;
