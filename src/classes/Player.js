@@ -1,4 +1,5 @@
 import {PATH_ENGINE_IMAGE, PATH_ENGINE_SPRITES, PATH_SPACESHIP_IMAGE, INITIAL_FRAMES} from "../utils/constants.js";
+
 import Projectile from "./Projectile.js";
 
 class Player {
@@ -19,8 +20,8 @@ class Player {
         this.engineImage = this.getImage(PATH_ENGINE_IMAGE);
         this.engineSprites = this.getImage(PATH_ENGINE_SPRITES);
        
-        this.sx = 0;
-        this.frameCount = INITIAL_FRAMES;
+        this.sx = 0; //definindo a posição de inicio da renderização das sprites
+        this.frameCount = INITIAL_FRAMES; //Controlando a troca dos frames das sprites
     }
 
     getImage(path){
@@ -50,25 +51,27 @@ class Player {
 
         ctx.drawImage(
             this.engineSprites, 
-            this.sx,
-            0, 
-            48,
-            42,
-            this.position.x, 
-            this.position.y, 
-            this.width, 
-            this.height);
+            this.sx,                //Posição de inicio da renderização da imagem das sprites - eixo x
+            0,                      //Posição de inicio da renderização da imagem das sprites - eixo y
+            48,                     //Recorte da imagem - Widht
+            48,                     //Recorte da imagem - Heigt
+            this.position.x,        //Posição da Renderização no player - eixo x 
+            this.position.y + 12,   //Posição da Renderização no player - eixo y 
+            this.width,             //Largura Renderizada
+            this.height             //Altura Renderizada
+        );
 
             ctx.drawImage(
             this.engineImage, 
             this.position.x, 
-            this.position.y + 5, //Deslocando o motor
-            this.width, 
-            this.height);
+            this.position.y + 8,    //Deslocando o motor
+            this.width,             //Largura Renderizada
+            this.height             //Altura Renderizada
+        );
 
         
-
-       this.update();
+        //Metodo que atualizara as sprites
+        this.update();
     /*    
         ctx.fillStyle = "red";
         ctx.fillRect(
@@ -82,6 +85,7 @@ class Player {
     }
 
     update(){
+        //Dimenção da imagem das sprites 144x48
         if(this.frameCount === 0){
             this.sx  = this.sx === 96 ? 0 : this.sx += 48;
 
@@ -92,14 +96,17 @@ class Player {
     }
 
     shoot(projectiles){
-        const p = new Projectile({
-            x: this.position.x + this.width / 2,
-            x: this.position.y
-        }, -5
+        const p = new Projectile(
+            {
+                x: this.position.x + this.width / 2,
+                y: this.position.y
+            }, 
+            -10
         );
 
         projectiles.push(p);
     }
 }
+2;
 
 export default Player;
