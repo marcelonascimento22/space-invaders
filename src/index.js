@@ -1,17 +1,30 @@
 import Projectile from "./classes/Projectile.js";
 import Player from "./classes/Player.js";
+import Invader from "./classes/Invader.js";
+import Grid from "./classes/Grid.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
+
 //Desativa a suavização da imagem
 ctx.imageSmoothingEnabled = false;
+
 //Instanciando o player
 const player = new Player(canvas.width, canvas.height);
+
+//Grid de Invaders
+const grid = new Grid(3, 6); 
+
 //const p = new Projectile({x:250, y: 700}, -5)
 const playerProjectiles = [];
+const invadersProjectiles = [];
+
+
+
+
 
 
 const keys = {
@@ -24,7 +37,9 @@ const keys = {
 };
 
 const drawProjectiles = () => {
-    playerProjectiles.forEach((projectile) => {
+    const projectiles = [...playerProjectiles, ...invadersProjectiles];
+    
+    projectiles.forEach((projectile) => {
         projectile.draw(ctx)
         projectile.update();
     });
@@ -39,16 +54,55 @@ const clearProjectiles = () => {
 };
 
 
+const checkShootInvaders = () => {
+    grid.invaders.forEach((invader, invaderIndex) => {
+        playerProjectiles.some((projectile, projectileIndex) => {
+            if(invader.hit(projectile)){
+                grid.invaders.splice(invaderIndex, 1);
+                playerProjectiles.splice(projectileIndex, 1);
+            }
+        });
+    });
+};
+
+/*
+const checkShootInvaders = () => {
+    for (let i = grid.invaders.length - 1; i >= 0; i--) {
+        const invader = grid.invaders[i];
+
+        for (let j = playerProjectiles.length - 1; j >= 0; j--) {
+            const projectile = playerProjectiles[j];
+
+            if (invader.hit(projectile)) {
+                // remove o invader
+                grid.invaders.splice(i, 1);
+
+                // remove o projétil
+                playerProjectiles.splice(j, 1);
+
+                // para evitar múltiplas colisões no mesmo frame
+                break;
+            }
+        }
+    }
+};
+
+*/
+
 const gameLoop = () => {
     //Limpando a tela ao movimentar
     ctx.clearRect (0, 0, canvas.width, canvas.height);
-/*
-    p.draw(ctx);
-    p.update();
-*/
+
     drawProjectiles();
     clearProjectiles();
+
+    checkShootInvaders();
  
+    grid.draw(ctx);
+    grid.update();
+  
+
+
 
     ctx.save(); //Salvando o COntexto
 
@@ -61,7 +115,6 @@ const gameLoop = () => {
     if(keys.shoot.pressed && keys.shoot.released){
         player.shoot(playerProjectiles);
         keys.shoot.released = false;
-        console.log(playerProjectiles)
     }
 
     //Movimentando e validando o movimento do player
@@ -109,5 +162,15 @@ addEventListener("keyup", (event) => {
         keys.shoot.released = true;
     }
 });
+
+setInterval(() => {
+    const invader = grid.getRandomInvader();
+
+    if(invader) {
+        invader.shoot(invadersProjectiles);
+    }
+}, 1000);
+
+
 
 gameLoop();

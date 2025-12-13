@@ -11,7 +11,7 @@ class Projectile {
         ctx.fillRect(
             this.position.x, 
             this.position.y, 
-            this.width, 
+            this.width,
             this.height
         );
     }
