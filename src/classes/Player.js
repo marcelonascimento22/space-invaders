@@ -22,6 +22,10 @@ class Player {
        
         this.sx = 0; //definindo a posição de inicio da renderização das sprites
         this.frameCount = INITIAL_FRAMES; //Controlando a troca dos frames das sprites
+        
+        this.active = true;
+        this.opacity = 1;
+
     }
 
     getImage(path){
@@ -32,14 +36,21 @@ class Player {
     }
 
     moveLeft() {
+        if (!this.active) return;
         this.position.x -= this.velocity;
+
     }
 
     moveRight() {
+        if (!this.active) return;
         this.position.x += this.velocity;
     }
 
     draw(ctx) {
+        if (!this.active) return;
+
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
         
         ctx.drawImage(
             this.image, 
@@ -81,6 +92,8 @@ class Player {
             this.height         //Altura
         );
         */
+
+        ctx.restore();
         
     }
 
@@ -96,6 +109,7 @@ class Player {
     }
 
     shoot(projectiles){
+        if (!this.active) return;
         const p = new Projectile(
             {
                 x: this.position.x + this.width / 2,
@@ -109,12 +123,20 @@ class Player {
 
     hit(projectile){
         return (
-            projectile.position.x >= this.position.x &&
-            projectile.position.x <= this.position.x + this.width &&
-            projectile.position.y >= this.position.y &&
-            projectile.position.y <= this.position.y + this.height
+            projectile.position.x >= this.position.x + 20 &&
+            projectile.position.x <= this.position.x + 20 + this.width - 20 &&
+            projectile.position.y >= this.position.y + 22 &&
+            projectile.position.y <= this.position.y + 22 + this.height - 34
 
-        )
+        );
+    }
+
+    die() {
+        this.opacity = 0;
+
+        if (this.opacity <= 0) {
+            this.active = false;
+        }
     }
 }
 

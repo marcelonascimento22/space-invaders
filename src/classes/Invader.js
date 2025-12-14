@@ -71,7 +71,7 @@ class Invader {
             projectile.position.y >= this.position.y &&
             projectile.position.y <= this.position.y + this.height
 
-        )
+        );
     }
 }
 
