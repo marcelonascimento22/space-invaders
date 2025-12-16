@@ -26,7 +26,6 @@ class SoundEffects {
     }
 
     playShootSound(){
-        console.log(this.currentShootSound)
         this.shootSounds[this.currentShootSound].currentTime = 0;
         this.shootSounds[this.currentShootSound].play();
 
@@ -35,7 +34,6 @@ class SoundEffects {
     }
 
     playHitSound(){
-        console.log(this.currentHitSound)
         this.hitSounds[this.currentHitSound].currentTime = 0;
         this.hitSounds[this.currentHitSound].play();
 
@@ -47,7 +45,7 @@ class SoundEffects {
     }
 
      playLevelSound(){
-        this.levelSounds.play();
+        this.nextLevelSounds.play();
     }
 
     adjustVolumes(){

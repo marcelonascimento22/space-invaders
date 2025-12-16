@@ -39,7 +39,7 @@ canvas {
 .start-screen> div {
     margin-top: auto;
 }
-.button-play, .button-restart {
+.button-play, .button-restart, .save-rank {
     border: none;
     padding: 12px 20px;
     border-radius: 5px;
@@ -51,7 +51,7 @@ canvas {
 
 }
 
-.button-play:hover, .button-restart:hover {
+.button-play:hover, .button-restart:hover, .save-rank:hover{
     background-color: #fff;
 }
 
@@ -79,6 +79,74 @@ canvas {
     max-width: 600px;
     margin: 0 auto;
 }
+
+.rank {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: zoom 3s ease-in-out forwards;
+}
+
+.rank td{
+    padding: 5px
+}
+
+
+.rank-input {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.rank-input > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.rank-input input {
+    width: 240px;
+    padding: 12px;
+    font-size: 20px;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #00000000;
+    color: rgb(255, 255, 255);
+    border: 3px solid #ffffff;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+
+
+.rank-input input:focus {
+    border-color: #ffffff;
+    box-shadow: 
+        0 0 5px #ffffff,
+        inset 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.rank-input input::placeholder {
+    color: wheat;
+}
+
+
+.score-ui,
+.rank,
+.rank-input {
+    display: none;
+}
+
+
 
 @keyframes zoom {
     from{

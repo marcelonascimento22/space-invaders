@@ -4,8 +4,16 @@ import Particle from "./classes/Particle.js";
 import { GameState } from "./utils/constants.js";
 import Obstacle from "./classes/Obstacle.js";
 import SoundEffects from "./classes/SoundEffects.js";
+import Storege from "./classes/Storege.js";
 
+
+const dbRank = new Storege;
 const soundEffects = new SoundEffects;
+
+dbRank.save(0, {nome: "AAA", score: 10});
+dbRank.save(1, {nome: "BBB", score: 20});
+dbRank.save(2, {nome: "CCC", score: 30});
+dbRank.save(3, {nome: "DDD", score: 40});
 
 const startScreen = document.querySelector(".start-screen");
 const gameOverScreen = document.querySelector(".game-over");
@@ -15,8 +23,12 @@ const levelElement = document.querySelector(".level-display");
 const highElement = document.querySelector(".high-display");
 const buttonPlay = document.querySelector(".button-play");
 const buttonRestart = document.querySelector(".button-restart");
+const rank = document.querySelector(".rank");
+const inputRank = document.querySelector(".rank-input");
+const buttonSaveRank = document.querySelector(".button-save-rank")
 
-gameOverScreen.remove();
+gameOverScreen.style.display = "none";
+rank.style.display = "none";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -35,7 +47,11 @@ const gameData = {
     high: 0
 }
 
+const qtdHigh = 0;
+
 const showGameData = () => {
+    gameData.high = rankArray[0].score > gameData.high ? rankArray[0].score : gameData.high
+
     scoreElement.textContent = gameData.score;
     levelElement.textContent = gameData.level;
     highElement.textContent = gameData.high;
@@ -52,6 +68,8 @@ const playerProjectiles = [];
 const invadersProjectiles = [];
 const particles = [];
 const obstacles = [];
+const rankArray = [];
+let control = 0;
 
 const initObstacles = () => {
     const x = canvas.width / 2 - 50;
@@ -94,7 +112,6 @@ const incrementLevel = (value) => {
 
 const drawProjectiles = () => {
     const projectiles = [...playerProjectiles, ...invadersProjectiles];
-    
     projectiles.forEach((projectile) => {
         projectile.draw(ctx)
         projectile.update();
@@ -112,6 +129,31 @@ const drawObstacles = () => {
     obstacles.forEach((obstacle) => obstacle.draw(ctx));
 };
 
+const drawRank = () => {
+    
+    rank.innerHTML = "";
+
+    for(let k = 0;  k <= rankArray.length-1; k++ ){
+        //console.log(`Nª:  ${k} | Nome: ${rankArray[k].nome} | Score: ${rankArray[k].score} `);
+    
+        let linha = document.createElement("tr");
+
+        let n = document.createElement("td");
+        let nome = document.createElement("td");
+        let score = document.createElement("td");
+
+        n.textContent = k + 1;
+        nome.textContent = rankArray[k].nome;
+        score.textContent = rankArray[k].score;
+
+        linha.append(n, nome, score);
+        rank.appendChild(linha);
+        
+    } 
+
+    
+}
+
 const clearProjectiles = () => {
     playerProjectiles.forEach((projectile, index) => {
         if (projectile.position.y <= 0){
@@ -119,6 +161,16 @@ const clearProjectiles = () => {
         }
     });
 };
+
+const clearProjectilesInvanders = () => {
+    invadersProjectiles.forEach((projectile, index) => {
+        if (projectile.position.y >= canvas.height){
+            invadersProjectiles.splice(index, 1);
+        }
+    });
+};
+
+
 
 const clearParticles = () => {
     particles.forEach((particle, id) =>{
@@ -151,6 +203,7 @@ const checkShootInvaders = () => {
     grid.invaders.forEach((invader, invaderIndex) => {
         playerProjectiles.some((projectile, projectileIndex) => {
             if(invader.hit(projectile)){
+                soundEffects.playHitSound();
                 explosion(invader, 10, "#941CFF");
                 /*
                 createExplosion(
@@ -164,7 +217,6 @@ const checkShootInvaders = () => {
                 */
 
                 incrementScore(1);
-                soundEffects.playHitSound();
                 grid.invaders.splice(invaderIndex, 1);
                 playerProjectiles.splice(projectileIndex, 1);
             }
@@ -183,6 +235,19 @@ const checkShootPlayer = () => {
     });
 };
 
+
+const checkCollisionPlayer = () => {
+    if (!player.active) return;
+
+    grid.invaders.some((invader) => {
+        
+        if(player.colliding(invader) || invader.position.y >= canvas.height - invader.height){
+            gameOver();
+        }
+    });
+};
+
+
 const checkShootObstacles = () => {
     obstacles.forEach((obstacle) => {
         invadersProjectiles.some((projectile, projectileIndex) => {
@@ -199,6 +264,36 @@ const checkShootObstacles = () => {
     });
 };
 
+const checkScoreStorege = () => {
+    if (control !== 0) return;
+
+    rankArray.length = 0;
+
+    /*
+    for (let i = 0; i < 5; i++) {
+        const value = dbRank.load(i);
+
+        if (
+            value &&
+            typeof value.nome === "string" &&
+            typeof value.score === "number"
+        ) {
+            rankArray.push(value);
+        }
+    }
+    */
+
+    rankArray.push(...dbRank.getAll());
+
+    rankArray.sort((a, b) => b.score - a.score);
+
+    //console.table(rankArray);
+    control = 1;
+};
+
+const isTop5 = (score) => {
+    return rankArray.length < 5 || score > rankArray[rankArray.length - 1].score;
+};
 
 const spawGrid = () => {
 
@@ -225,53 +320,27 @@ const explosion = (obj, size, color) => {
 
 const gameOver = () => {
     soundEffects.playExplosionSound();
+
     explosion(player, 10, "red");
     explosion(player, 10, "white");
     explosion(player, 10, "#4D9BE6");
     explosion(player, 10, "crimson");
-    /*
-    createExplosion(
-                {
-                    x: player.position.x + player.width / 2,
-                    y: player.position.y + player.height / 2
-                },
-                10,
-                "red"
-            );
 
-            createExplosion(
-                {
-                    x: player.position.x + player.width / 2,
-                    y: player.position.y + player.height / 2
-                },
-                10,
-                "white"
-            );
-
-            createExplosion(
-                {
-                    x: player.position.x + player.width / 2,
-                    y: player.position.y + player.height / 2
-                },
-                10,
-                "crimson"
-            );
-
-            createExplosion(
-                {
-                    x: player.position.x + player.width / 2,
-                    y: player.position.y + player.height / 2
-                },
-                10,
-                "#4D9BE6"
-            );
-    */
     player.die();
-    gameData.level = 0;
+    gameData.level = 1;
     currentState = GameState.GAME_OVER;
-    document.body.append(gameOverScreen);
-    
-}
+
+    // ESCONDE TUDO
+    inputRank.style.display = "none";
+    gameOverScreen.style.display = "none";
+
+    // DECISÃO PRINCIPAL
+    if (isTop5(gameData.score)) {
+        inputRank.style.display = "flex"; // mostra input
+    } else {
+        gameOverScreen.style.display = "flex"; // mostra game over
+    }
+};
 
 /*
 const checkShootInvaders = () => {
@@ -302,7 +371,9 @@ const checkShootInvaders = () => {
 const gameLoop = () => {
     //Limpando a tela ao movimentar
     ctx.clearRect (0, 0, canvas.width, canvas.height);
+
     if(currentState == GameState.PLAYING){
+        
         showGameData();
 
         spawGrid();
@@ -312,10 +383,12 @@ const gameLoop = () => {
         drawObstacles();
 
         clearProjectiles();
+        clearProjectilesInvanders();
         clearParticles();
 
         checkShootInvaders();
         checkShootPlayer();
+        checkCollisionPlayer();
         checkShootObstacles();
 
         grid.draw(ctx);
@@ -368,6 +441,7 @@ const gameLoop = () => {
         drawParticles();
         drawProjectiles();
         drawObstacles(); 
+        
 
         checkShootObstacles();
 
@@ -405,6 +479,7 @@ buttonPlay.addEventListener("click", () => {
     startScreen.remove();
     scoreUi.style.display = "block";
     currentState = GameState.PLAYING;
+    rank.style.display = "none";
 
     setInterval(() => {
         const invader = grid.getRandomInvader();
@@ -418,6 +493,7 @@ buttonPlay.addEventListener("click", () => {
 
 buttonRestart.addEventListener("click", () => {
     currentState = GameState.PLAYING;
+    rank.style.display = "none";
     player.active = true;
     player.opacity = 1;
 
@@ -427,10 +503,38 @@ buttonRestart.addEventListener("click", () => {
     invadersProjectiles.length = 0;
 
     gameData.score = 0;
-    gameData.leval = 0;
+    gameData.level = 1;
 
-    gameOverScreen.remove();
+    gameOverScreen.style.display = "none";
 
 });
 
+buttonSaveRank.addEventListener("click", () => {
+    const playerName = document.getElementById("playerName").value.trim();
+    if (!playerName) return alert("Digite seu nome!");
+
+    // adiciona ao ranking
+    rankArray.push({ nome: playerName, score: gameData.score });
+
+    // ordena e mantém top 5
+    rankArray.sort((a, b) => b.score - a.score);
+    rankArray.splice(5);
+
+    // salva no localStorage
+    rankArray.forEach((item, index) => {
+        dbRank.save(index, item);
+    });
+    
+    gameData.level = 1;
+
+    drawRank();
+    rank.style.display = "table";
+
+    // fecha input e abre game over
+    inputRank.style.display = "none";
+    gameOverScreen.style.display = "flex";
+});
+
+
+checkScoreStorege();
 gameLoop();

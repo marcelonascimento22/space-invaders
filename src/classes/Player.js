@@ -131,6 +131,15 @@ class Player {
         );
     }
 
+    colliding(invader){
+    return (
+        this.position.x < invader.position.x + invader.width &&
+        this.position.x + this.width > invader.position.x &&
+        this.position.y < invader.position.y + invader.height &&
+        this.position.y + this.height > invader.position.y
+    );
+};
+
     die() {
         this.opacity = 0;
 
